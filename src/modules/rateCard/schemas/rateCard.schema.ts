@@ -5,14 +5,14 @@ export type RateCardDocument = RateCard & Document;
 
 @Schema({})
 export class RateCard {
-	@Prop({type: Number, required: true})
-	price: number;
+  @Prop({ type: Number, required: true })
+  price: number;
 
-	@Prop({type: Number, required: true})
-	penalty: number;
+  @Prop({ type: Number, required: true })
+  penalty: number;
 
-	@Prop({type: Number, required: true})
-	incentive: number;
+  @Prop({ type: Number, required: true })
+  incentive: number;
 }
 
 const RateCardSchema = SchemaFactory.createForClass(RateCard);

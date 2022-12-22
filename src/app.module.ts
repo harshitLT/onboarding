@@ -7,23 +7,26 @@ import { UserModule } from './modules/user/v1/user.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, validationSchema: Joi.object({
-      PORT: Joi.number().required(),
-      npm_package_name: Joi.string().required(),
-      MONGODB_URL: Joi.string().required(),
-      JWT_SECRET: Joi.string().required(),
-      JWT_ACCESS_EXPIRATION_MINUTES: Joi.string().required(),
-      JWT_REFRESH_EXPIRATION_DAYS: Joi.string().required(),
-    }) }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        PORT: Joi.number().required(),
+        npm_package_name: Joi.string().required(),
+        MONGODB_URL: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_ACCESS_EXPIRATION_MINUTES: Joi.string().required(),
+        JWT_REFRESH_EXPIRATION_DAYS: Joi.string().required(),
+      }),
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-          uri: await configService.get('MONGODB_URL'),
-        }),
-        inject: [ConfigService],
-  }),
-  AuthModule,
-  UserModule,
+        uri: await configService.get('MONGODB_URL'),
+      }),
+      inject: [ConfigService],
+    }),
+    AuthModule,
+    UserModule,
   ],
 })
 export class AppModule {}

@@ -16,14 +16,17 @@ export class TripService {
     private readonly userService: UserService,
     private readonly rateCardService: RateCardService,
     private readonly logger: Logger,
-  ) { }
+  ) {}
 
   async getById(id: string) {
     const trip = await this.tripModel.findOne({ _id: id });
     if (trip) {
       return trip;
     }
-    throw new HttpException('Trip with this id does not exist', HttpStatus.NOT_FOUND);
+    throw new HttpException(
+      'Trip with this id does not exist',
+      HttpStatus.NOT_FOUND,
+    );
   }
 
   /**
@@ -31,17 +34,15 @@ export class TripService {
    * @param {TripDTO} tripDTO
    * @return {Promise}
    */
-  async create(
-    tripDTO: TripDTO,
-  ): Promise<TripDetailsDTO> {
-    const {assignedTo, rateCard} = tripDTO;
+  async create(tripDTO: TripDTO): Promise<TripDetailsDTO> {
+    const { assignedTo, rateCard } = tripDTO;
     let assignedToId: MongooseSchema.Types.ObjectId;
     let rateCardId: MongooseSchema.Types.ObjectId;
-    if(assignedTo){
+    if (assignedTo) {
       const user = await this.userService.getById(assignedTo);
       assignedToId = user._id;
     }
-    if(rateCard){
+    if (rateCard) {
       const rateCardObject = await this.rateCardService.getById(rateCard);
       rateCardId = rateCardObject._id;
     }
@@ -49,7 +50,7 @@ export class TripService {
       ...tripDTO,
       assignedTo: assignedToId,
       rateCard: rateCardId,
-    }
+    };
 
     const createdTrip = new this.tripModel(doc);
 

@@ -1,15 +1,15 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString } from 'class-validator';
 
 export class RateCardDetailsDTO {
-	@IsString()
-	_id: string;
+  @IsString()
+  _id: string;
 
-	@IsNumber()
-	price: number;
+  @IsNumber()
+  price: number;
 
-	@IsNumber()
-	penalty?: number;
+  @IsNumber()
+  penalty?: number;
 
-	@IsNumber()
-	incentive?: number;
+  @IsNumber()
+  incentive?: number;
 }

@@ -15,14 +15,17 @@ export class RateCardService {
     private rateCardModel: Model<RateCardDocument>,
     private readonly userService: UserService,
     private readonly logger: Logger,
-  ) { }
+  ) {}
 
   async getById(id: string) {
     const rateCard = await this.rateCardModel.findOne({ _id: id });
     if (rateCard) {
       return rateCard;
     }
-    throw new HttpException('RateCard with this id does not exist', HttpStatus.NOT_FOUND);
+    throw new HttpException(
+      'RateCard with this id does not exist',
+      HttpStatus.NOT_FOUND,
+    );
   }
 
   /**
@@ -30,11 +33,12 @@ export class RateCardService {
    * @param {RateCardDTO} rateCardDTO
    * @return {Promise}
    */
-  async create(
-    rateCardDTO: RateCardDTO,
-  ): Promise<RateCardDetailsDTO> {
-    const createdRateCard = new this.rateCardModel(rateCardDTO);
-
-    return createdRateCard.save();
+  async create(rateCardDTO: RateCardDTO): Promise<RateCardDetailsDTO> {
+    try {
+      const createdRateCard = new this.rateCardModel(rateCardDTO);
+      return createdRateCard.save();
+    } catch (error) {
+      throw error;
+    }
   }
 }

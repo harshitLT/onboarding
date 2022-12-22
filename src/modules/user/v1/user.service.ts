@@ -13,14 +13,17 @@ export class UserService {
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
     private readonly logger: Logger,
-  ) { }
+  ) {}
 
   async getByPhone(phone: string): Promise<User> {
     const user = await this.userModel.findOne({ phone });
     if (user) {
       return user;
     }
-    throw new HttpException('User with this phone does not exist', HttpStatus.NOT_FOUND);
+    throw new HttpException(
+      'User with this phone does not exist',
+      HttpStatus.NOT_FOUND,
+    );
   }
 
   async getById(id: string) {
@@ -28,7 +31,10 @@ export class UserService {
     if (user) {
       return user;
     }
-    throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+    throw new HttpException(
+      'User with this id does not exist',
+      HttpStatus.NOT_FOUND,
+    );
   }
 
   /**
@@ -36,12 +42,13 @@ export class UserService {
    * @param {UserDTO} userDTO
    * @return {Promise}
    */
-  async create(
-    userDTO: UserDTO,
-  ): Promise<UserDetailsDTO> {
+  async create(userDTO: UserDTO): Promise<UserDetailsDTO> {
     const user = await this.userModel.findOne({ phone: userDTO.phone });
-    if(user){
-      throw new HttpException('User with this phone already exists', HttpStatus.BAD_REQUEST);
+    if (user) {
+      throw new HttpException(
+        'User with this phone already exists',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const hash = await bcrypt.hash(userDTO.password, 10);
@@ -51,20 +58,23 @@ export class UserService {
       password: hash,
       role: userDTO.role,
       phone: userDTO.phone,
-    }
+    };
 
     const createdUser = new this.userModel(doc);
 
-    return createdUser.save().then((user) => {
-      const userDetails: UserDetailsDTO = new UserDetailsDTO();
-      userDetails._id = user.id;
-      userDetails.name = user.name;
-      userDetails.active = user.active;
-      userDetails.phone = user.phone;
-      userDetails.role = user.role;
-      return userDetails;
-    }).catch((e) => {
-      throw e;
-    });
+    return createdUser
+      .save()
+      .then((user) => {
+        const userDetails: UserDetailsDTO = new UserDetailsDTO();
+        userDetails._id = user.id;
+        userDetails.name = user.name;
+        userDetails.active = user.active;
+        userDetails.phone = user.phone;
+        userDetails.role = user.role;
+        return userDetails;
+      })
+      .catch((e) => {
+        throw e;
+      });
   }
 }

@@ -1,6 +1,6 @@
 interface TokenPayload {
-  userId: string,
-  type: string,
-  iat: number,
-  exp: number,
+  userId: string;
+  type: string;
+  iat: number;
+  exp: number;
 }
