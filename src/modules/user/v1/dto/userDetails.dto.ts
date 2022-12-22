@@ -1,4 +1,10 @@
-import { IsString, IsPhoneNumber, IsEnum, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsPhoneNumber,
+  IsEnum,
+  IsBoolean,
+  IsDate,
+} from 'class-validator';
 import { Roles } from '../../../../gurads/roles/enum/role.enum';
 
 export class UserDetailsDTO {
@@ -17,6 +23,12 @@ export class UserDetailsDTO {
   @IsString()
   _id: string;
 
+  @IsDate()
+  createdAt?: Date;
+
+  @IsDate()
+  updatedAt?: Date;
+
   @IsBoolean()
-  active: boolean;
+  active?: boolean;
 }

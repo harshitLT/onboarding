@@ -17,6 +17,7 @@ import RequestWithUser from '../interfaces/auth.requestWithUser.interface';
 import JwtAuthenticationGuard from 'src/gurads/jwt/jwtAuthentication.guard';
 import { RefreshDTO } from './dto/refresh.dto';
 import { RefreshHeadersDTO } from './dto/refreshHeaders.dto';
+import { Helper } from 'src/utils/helpers';
 
 @Controller({
   version: '1',
@@ -36,10 +37,7 @@ export class AuthController {
       return this.AuthService.login(request.user);
     } catch (err) {
       this.logger.error(`Error while login: ${JSON.stringify(err)}`);
-      if (err instanceof HttpException) {
-        throw err;
-      }
-      throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+      Helper.errorHelper(err);
     }
   }
 
@@ -51,10 +49,7 @@ export class AuthController {
       return this.AuthService.logout(request.user);
     } catch (err) {
       this.logger.error(`Error while login: ${JSON.stringify(err)}`);
-      if (err instanceof HttpException) {
-        throw err;
-      }
-      throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+      Helper.errorHelper(err);
     }
   }
 
@@ -68,10 +63,7 @@ export class AuthController {
       return this.AuthService.refresh(headers.authorization, body.token);
     } catch (err) {
       this.logger.error(`Error while login: ${JSON.stringify(err)}`);
-      if (err instanceof HttpException) {
-        throw err;
-      }
-      throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+      Helper.errorHelper(err);
     }
   }
 }

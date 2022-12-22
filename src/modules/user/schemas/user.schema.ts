@@ -25,6 +25,12 @@ export class User {
 
   @Prop({ default: false })
   active?: boolean;
+
+  @Prop()
+  createdAt?: Date;
+
+  @Prop()
+  updatedAt?: Date;
 }
 
 const UserSchema = SchemaFactory.createForClass(User);

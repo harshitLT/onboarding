@@ -17,6 +17,7 @@ import { Logger } from '@nestjs/common';
 import JwtAuthenticationGuard from 'src/gurads/jwt/jwtAuthentication.guard';
 import RoleGuard from 'src/gurads/roles/role.guard';
 import { Roles } from 'src/gurads/roles/enum/role.enum';
+import { Helper } from 'src/utils/helpers';
 
 @Controller({
   version: '1',
@@ -37,7 +38,7 @@ export class RateCardController {
       this.logger.error(
         `Error while creating rateCard: ${JSON.stringify(err)}`,
       );
-      throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+      Helper.errorHelper(err);
     }
   }
 }

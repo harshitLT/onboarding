@@ -43,38 +43,29 @@ export class UserService {
    * @return {Promise}
    */
   async create(userDTO: UserDTO): Promise<UserDetailsDTO> {
-    const user = await this.userModel.findOne({ phone: userDTO.phone });
-    if (user) {
-      throw new HttpException(
-        'User with this phone already exists',
-        HttpStatus.BAD_REQUEST,
-      );
+    try {
+      const user = await this.userModel.findOne({ phone: userDTO.phone });
+      if (user) {
+        throw new HttpException(
+          'User with this phone already exists',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const hash = await bcrypt.hash(userDTO.password, 10);
+
+      const doc: User = {
+        name: userDTO.name,
+        password: hash,
+        role: userDTO.role,
+        phone: userDTO.phone,
+      };
+
+      const createdUser = new this.userModel(doc);
+
+      return createdUser.save();
+    } catch (error) {
+      throw error;
     }
-
-    const hash = await bcrypt.hash(userDTO.password, 10);
-
-    const doc: User = {
-      name: userDTO.name,
-      password: hash,
-      role: userDTO.role,
-      phone: userDTO.phone,
-    };
-
-    const createdUser = new this.userModel(doc);
-
-    return createdUser
-      .save()
-      .then((user) => {
-        const userDetails: UserDetailsDTO = new UserDetailsDTO();
-        userDetails._id = user.id;
-        userDetails.name = user.name;
-        userDetails.active = user.active;
-        userDetails.phone = user.phone;
-        userDetails.role = user.role;
-        return userDetails;
-      })
-      .catch((e) => {
-        throw e;
-      });
   }
 }
