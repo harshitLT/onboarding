@@ -83,16 +83,22 @@ export class AuthService {
   ): Promise<object> {
     try {
       bearerToken = bearerToken.replace('Bearer', '').trim();
-      const { userId, exp } = this.jwtService.decode(bearerToken) as {
+      const { userId } = this.jwtService.decode(bearerToken) as {
         [key: string]: any;
       };
       const user = await this.userService.getById(userId);
+      if (!user.active) {
+        throw new HttpException('Session Expired', HttpStatus.UNAUTHORIZED);
+      }
       const storedRefreshToken = await this.tokenModel.findOne({ userId });
-      if (
-        storedRefreshToken.token === refreshToken &&
-        moment().isBefore(moment.unix(exp))
-      ) {
-        return await this.generateAuthTokens(user);
+      if (storedRefreshToken.token === refreshToken) {
+        const { exp } = this.jwtService.decode(refreshToken) as {
+          [key: string]: any;
+        };
+        if (moment().isBefore(moment.unix(exp))) {
+          await storedRefreshToken.delete();
+          return await this.generateAuthTokens(user);
+        }
       }
       throw new HttpException('Invalid refresh token', HttpStatus.FORBIDDEN);
     } catch (error) {

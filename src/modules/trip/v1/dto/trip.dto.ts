@@ -1,4 +1,4 @@
-import { IsString, IsDate, IsNumber } from 'class-validator';
+import { IsString, IsNumber, IsDateString } from 'class-validator';
 
 export class TripDTO {
   @IsString()
@@ -7,7 +7,7 @@ export class TripDTO {
   @IsString()
   rateCard?: string;
 
-  @IsDate()
+  @IsDateString()
   startTime: Date;
 
   @IsNumber()

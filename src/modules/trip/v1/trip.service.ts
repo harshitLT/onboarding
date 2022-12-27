@@ -21,7 +21,7 @@ export class TripService {
     private readonly logger: Logger,
   ) {}
 
-  async getById(id: string) {
+  async getById(id: string | MongooseSchema.Types.ObjectId) {
     const trip = await this.tripModel.findOne({ _id: id });
     if (trip) {
       return trip;
@@ -96,7 +96,7 @@ export class TripService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      if (trip.assignedTo != user._id) {
+      if (!user._id.equals(trip.assignedTo)) {
         throw new HttpException(
           'This trip is not assigned to you.',
           HttpStatus.BAD_REQUEST,
@@ -105,7 +105,7 @@ export class TripService {
 
       await trip.update({
         status: TripStatus.IN_PROGRESS,
-        actualStartTime: moment().toDate,
+        actualStartTime: new Date(),
       });
     } catch (error) {
       throw error;
@@ -113,7 +113,7 @@ export class TripService {
   }
 
   /**
-   * This method is used for starting the trip
+   * This method is used for ending the trip
    * @param {string} tripId
    * @param {UserDocument} user
    * @param {number} actualKms
@@ -127,7 +127,7 @@ export class TripService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      if (trip.assignedTo != user._id) {
+      if (!user._id.equals(trip.assignedTo)) {
         throw new HttpException(
           'This trip is not assigned to you.',
           HttpStatus.BAD_REQUEST,
@@ -141,42 +141,18 @@ export class TripService {
   }
 
   /**
-   * This method is used for starting the trip
-   * @param {Express.Multer.File} file
-   * @param {UserDocument} user
-   * @param {string} tripId
-   */
-  async uploadPOD(
-    user: UserDocument,
-    file: Express.Multer.File,
-    tripId: string,
-  ) {
-    try {
-      const trip = await this.getById(tripId);
-      if (trip.status != TripStatus.COMPLETED) {
-        throw new HttpException(
-          'You can upload POD only for completed trips',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      if (trip.assignedTo != user._id) {
-        throw new HttpException(
-          'This trip is not assigned to you.',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
    * This method is used for creating trip
    * @param {TripDTO} tripDTO
    * @return {Promise}
    */
   async create(tripDTO: TripDTO): Promise<TripDetailsDTO> {
     try {
+      if (moment().isAfter(moment(tripDTO.startTime))) {
+        throw new HttpException(
+          'Start time must be after the current time',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       const { assignedTo, rateCard } = tripDTO;
       let assignedToId: MongooseSchema.Types.ObjectId;
       let rateCardId: MongooseSchema.Types.ObjectId;
@@ -192,6 +168,7 @@ export class TripService {
         ...tripDTO,
         assignedTo: assignedToId,
         rateCard: rateCardId,
+        startTime: moment(tripDTO.startTime).toDate(),
       };
 
       const createdTrip = new this.tripModel(doc);

@@ -26,7 +26,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       if (moment().isAfter(moment.unix(payload.exp))) {
         throw new HttpException('Token Expired', HttpStatus.UNAUTHORIZED);
       }
-      const user = this.userService.getById(payload.userId);
+      const user = await this.userService.getById(payload.userId);
+      if (!user.active) {
+        throw new HttpException('Session Expired', HttpStatus.UNAUTHORIZED);
+      }
       return user;
     } catch (error) {
       throw error;

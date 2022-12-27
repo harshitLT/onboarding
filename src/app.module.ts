@@ -3,6 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
 import { AuthModule } from './modules/auth/v1/auth.module';
+import { PaymentModule } from './modules/payment/v1/payment.module';
+import { RateCardModule } from './modules/rateCard/v1/rateCard.module';
+import { TripModule } from './modules/trip/v1/trip.module';
 import { UserModule } from './modules/user/v1/user.module';
 
 @Module({
@@ -27,6 +30,9 @@ import { UserModule } from './modules/user/v1/user.module';
     }),
     AuthModule,
     UserModule,
+    TripModule,
+    RateCardModule,
+    PaymentModule,
   ],
 })
 export class AppModule {}

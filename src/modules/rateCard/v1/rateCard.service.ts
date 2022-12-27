@@ -17,7 +17,7 @@ export class RateCardService {
     private readonly logger: Logger,
   ) {}
 
-  async getById(id: string) {
+  async getById(id: string | MongooseSchema.Types.ObjectId) {
     const rateCard = await this.rateCardModel.findOne({ _id: id });
     if (rateCard) {
       return rateCard;

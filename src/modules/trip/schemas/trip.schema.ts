@@ -6,8 +6,8 @@ export type TripDocument = Trip & Document;
 
 @Schema({
   timestamps: {
-    updatedAt: 'updated_at',
-    createdAt: 'created_at',
+    updatedAt: 'updatedAt',
+    createdAt: 'createdAt',
   },
 })
 export class Trip {

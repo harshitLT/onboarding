@@ -27,7 +27,7 @@ export class UserService {
   }
 
   async getById(id: string) {
-    const user = await this.userModel.findOne({ _id: id, active: true });
+    const user = await this.userModel.findOne({ _id: id });
     if (user) {
       return user;
     }
