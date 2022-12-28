@@ -22,7 +22,7 @@ import RoleGuard from 'src/gurads/roles/role.guard';
 import { Roles } from 'src/gurads/roles/enum/role.enum';
 import { Helper } from 'src/utils/helpers';
 import RequestWithUser from 'src/modules/auth/interfaces/auth.requestWithUser.interface';
-import { PaginationParams } from 'src/modules/payment/v1/dto/paginationParams.dto';
+import { PaginationParams } from 'src/utils/paginationParams.dto';
 
 @Controller({
   version: '1',

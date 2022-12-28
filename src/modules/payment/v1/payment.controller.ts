@@ -18,7 +18,7 @@ import { Roles } from 'src/gurads/roles/enum/role.enum';
 import { Helper } from 'src/utils/helpers';
 import RequestWithUser from 'src/modules/auth/interfaces/auth.requestWithUser.interface';
 import { PODUploadDTO } from './dto/podUpload.dto';
-import { PaginationParams } from './dto/paginationParams.dto';
+import { PaginationParams } from '../../../utils/paginationParams.dto';
 import { PODApproveDTO } from './dto/podApprove.dto';
 
 @Controller({
