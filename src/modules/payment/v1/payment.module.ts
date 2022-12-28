@@ -13,6 +13,9 @@ import {
 } from '../schemas/paymentRequest.schema';
 import { TripModule } from 'src/modules/trip/v1/trip.module';
 import { UserModule } from 'src/modules/user/v1/user.module';
+import { BullModule } from '@nestjs/bull';
+import { PaymentProcessor } from './payment.processor';
+import { Ledger, LedgerSchema } from '../schemas/ledger.schema';
 
 @Module({
   imports: [
@@ -25,14 +28,21 @@ import { UserModule } from 'src/modules/user/v1/user.module';
         name: PaymentRequest.name,
         schema: PaymentRequestSchema,
       },
+      {
+        name: Ledger.name,
+        schema: LedgerSchema,
+      },
     ]),
     JwtModule,
     TripModule,
     RateCardModule,
     UserModule,
+    BullModule.registerQueue({
+      name: 'payments-queue',
+    }),
   ],
   controllers: [PaymentController],
-  providers: [PaymentService, Logger, JwtStrategy],
+  providers: [PaymentService, Logger, JwtStrategy, PaymentProcessor],
   exports: [PaymentService],
 })
 export class PaymentModule {}

@@ -7,6 +7,7 @@ export type PaymentRequestDocument = PaymentRequest & Document;
 @Schema({
   timestamps: {
     createdAt: 'createdAt',
+    updatedAt: 'processedAt',
   },
 })
 export class PaymentRequest {

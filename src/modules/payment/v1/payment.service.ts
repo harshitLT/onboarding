@@ -14,6 +14,8 @@ import {
 } from '../schemas/paymentRequest.schema';
 import { RateCardService } from 'src/modules/rateCard/v1/rateCard.service';
 import * as moment from 'moment';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class PaymentService {
@@ -24,6 +26,8 @@ export class PaymentService {
     private paymentRequestModel: Model<PaymentRequestDocument>,
     private readonly rateCardService: RateCardService,
     private readonly tripService: TripService,
+    @InjectQueue('payments-queue')
+    private paymentsQueue: Queue,
     private readonly logger: Logger,
   ) {}
 
@@ -36,7 +40,7 @@ export class PaymentService {
     const offset = (page ?? 0) * (pageSize ?? 10);
     return this.paymentRequestModel
       .find()
-      .sort({ _id: 1 })
+      .sort({ _id: -1 })
       .skip(offset)
       .limit(pageSize ?? 10);
   }
@@ -110,11 +114,17 @@ export class PaymentService {
   async approveRejectPOD(isApproved: boolean, podId: string) {
     try {
       const pod = await this.getById(podId);
+      if (pod.status != PODStatus.CREATED) {
+        throw new HttpException(
+          'Only documents in created state can be accepted/rejected',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       await pod.update({
         status: isApproved ? PODStatus.APPROVED : PODStatus.REJECTED,
       });
       if (isApproved) {
-        await this._createPaymentRequest(pod.tripId);
+        return await this._createPaymentRequest(pod.tripId);
       }
     } catch (error) {
       throw error;
@@ -151,6 +161,11 @@ export class PaymentService {
 
       const paymentRequest = await this.paymentRequestModel.create(doc);
       await paymentRequest.save();
+      const job = await this.paymentsQueue.add(paymentRequest, {
+        delay: 60000, // 1 min in ms
+        attempts: 2,
+      });
+      console.log(`created job ${job.id}`);
     } catch (error) {
       throw error;
     }
