@@ -33,6 +33,21 @@ export class TripService {
   }
 
   /**
+   * This method is used for fetching payment requests
+   * @param {number} pageSize
+   * @param {number} page
+   * @param {UserDocument} user
+   */
+  async get(page: number, user: UserDocument, pageSize?: number) {
+    const offset = (page ?? 0) * (pageSize ?? 10);
+    return this.tripModel
+      .find({ _id: user._id })
+      .sort({ _id: -1 })
+      .skip(offset)
+      .limit(pageSize ?? 10);
+  }
+
+  /**
    * This method is used for attaching trip to rate card
    * @param {string} rateCardId
    * @param {string} tripId
