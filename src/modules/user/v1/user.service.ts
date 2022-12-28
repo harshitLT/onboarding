@@ -6,13 +6,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Logger } from '@nestjs/common';
 import { UserDTO } from './dto/user.dto';
 import { UserDetailsDTO } from './dto/userDetails.dto';
+import { Socket } from 'socket.io';
+import { WsException } from '@nestjs/websockets';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
-    private readonly logger: Logger,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async getByPhone(phone: string): Promise<User> {
@@ -24,6 +29,29 @@ export class UserService {
       'User with this phone does not exist',
       HttpStatus.NOT_FOUND,
     );
+  }
+
+  async getUserFromSocket(socket: Socket) {
+    try {
+      const token = socket.handshake.headers.authorization.replace(
+        'Bearer ',
+        '',
+      );
+      let user: UserDocument;
+      const payload: TokenPayload = this.jwtService.verify(token, {
+        secret: this.configService.get('JWT_SECRET'),
+      });
+      if (payload.userId) {
+        return this.getById(payload.userId);
+      }
+      if (!user) {
+        throw new WsException('Invalid credentials.');
+      }
+      return user;
+    } catch (error) {
+      console.log(error);
+      throw new WsException('Invalid credentials.');
+    }
   }
 
   async getById(id: string) {

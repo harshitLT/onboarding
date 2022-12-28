@@ -11,6 +11,7 @@ import {
   PaymentRequest,
   PaymentRequestDocument,
 } from '../schemas/paymentRequest.schema';
+import { PaymentGateway } from './payment.gateway';
 
 @Processor('payments-queue')
 export class PaymentProcessor {
@@ -21,6 +22,7 @@ export class PaymentProcessor {
     private paymentRequest: Model<PaymentRequestDocument>,
     private readonly configService: ConfigService,
     private readonly tripService: TripService,
+    private readonly gateway: PaymentGateway,
   ) {}
 
   @Process()
@@ -40,8 +42,15 @@ export class PaymentProcessor {
             : PaymentRequestStatus.FAILED,
         },
       );
+      const updatedPaymentRequest = await this.paymentRequest.findOne({
+        _id: paymentRequest._id,
+      });
+      const trip = await this.tripService.getById(paymentRequest.tripId);
+      this.gateway.server.sockets.emit(
+        trip.assignedTo.toString(),
+        updatedPaymentRequest,
+      );
       if (process) {
-        const trip = await this.tripService.getById(paymentRequest.tripId);
         const doc: Ledger = {
           userId: trip.assignedTo,
           amount: totalAmount,

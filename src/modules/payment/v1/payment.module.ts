@@ -16,6 +16,7 @@ import { UserModule } from 'src/modules/user/v1/user.module';
 import { BullModule } from '@nestjs/bull';
 import { PaymentProcessor } from './payment.processor';
 import { Ledger, LedgerSchema } from '../schemas/ledger.schema';
+import { PaymentGateway } from './payment.gateway';
 
 @Module({
   imports: [
@@ -42,7 +43,13 @@ import { Ledger, LedgerSchema } from '../schemas/ledger.schema';
     }),
   ],
   controllers: [PaymentController],
-  providers: [PaymentService, Logger, JwtStrategy, PaymentProcessor],
+  providers: [
+    PaymentService,
+    Logger,
+    JwtStrategy,
+    PaymentProcessor,
+    PaymentGateway,
+  ],
   exports: [PaymentService],
 })
 export class PaymentModule {}
