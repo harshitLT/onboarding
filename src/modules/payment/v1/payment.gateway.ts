@@ -19,15 +19,14 @@ export class PaymentGateway implements OnGatewayConnection {
 
   async handleConnection(socket: Socket) {
     try {
-      socket.client.request;
-      //   if (socket.eventNames.length != 1) {
+      //   if (socket.eventNames().length != 1) {
       //     throw new WsException('Can only listen to one event');
       //   }
       const user = await this.userService.getUserFromSocket(socket);
       if (user.role !== Roles.DRIVER) {
         throw new WsException('Only driver can subscribe');
       }
-      //   if (socket.eventNames[0] !== user.id) {
+      //   if (socket.eventNames()[0] !== user.id) {
       //     throw new WsException('Can only listen to your own id');
       //   }
     } catch (error) {
